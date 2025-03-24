@@ -85,7 +85,7 @@ TEST_F(OperatorTest, Join) {
          SelectInfo(r_rid, r2_bind, r_col_id));
     auto r1_scan_ptr = std::make_unique<Scan>(r1_scan);
     auto r2_scan_ptr = std::make_unique<Scan>(r2_scan);
-    Join join(move(r1_scan_ptr), move(r2_scan_ptr), p_info);
+    Join join(std::move(r1_scan_ptr), std::move(r2_scan_ptr), p_info);
     join.run();
   }
   {
@@ -94,7 +94,7 @@ TEST_F(OperatorTest, Join) {
     Scan r1_scan2(r1, 1);
     auto left_ptr = std::make_unique<Scan>(r1_scan);
     auto right_ptr = std::make_unique<Scan>(r1_scan2);
-    Join join(move(left_ptr), move(right_ptr), p_info);
+    Join join(std::move(left_ptr), std::move(right_ptr), p_info);
     join.require(SelectInfo(r1_bind, 0));
     join.run();
 
@@ -113,7 +113,7 @@ TEST_F(OperatorTest, Join) {
     auto left_ptr = std::make_unique<Scan>(r2_scan);
     auto right_ptr = std::make_unique<Scan>(r1_scan);
     PredicateInfo p_info(SelectInfo(1, r2_bind, 1), SelectInfo(0, r1_bind, 2));
-    Join join(move(left_ptr), move(right_ptr), p_info);
+    Join join(std::move(left_ptr), std::move(right_ptr), p_info);
     join.require(SelectInfo(r1_bind, 1));
     join.require(SelectInfo(r2_bind, 3));
     // Request a column two times (should not have an effect)
@@ -139,7 +139,7 @@ TEST_F(OperatorTest, Checksum) {
   {
     auto r1_scan_ptr = std::make_unique<Scan>(r1_scan);
     std::vector<SelectInfo> checksum_columns;
-    Checksum checkSum(move(r1_scan_ptr), checksum_columns);
+    Checksum checkSum(std::move(r1_scan_ptr), checksum_columns);
     checkSum.run();
     ASSERT_EQ(checkSum.check_sums().size(), 0ull);
   }
@@ -148,7 +148,7 @@ TEST_F(OperatorTest, Checksum) {
     std::vector<SelectInfo> checksum_columns;
     checksum_columns.emplace_back(0, rel_binding, 0);
     checksum_columns.emplace_back(0, rel_binding, 2);
-    Checksum checksum(move(r1_scan_ptr), checksum_columns);
+    Checksum checksum(std::move(r1_scan_ptr), checksum_columns);
     checksum.run();
 
     ASSERT_EQ(checksum.check_sums().size(), 2ull);
@@ -167,7 +167,7 @@ TEST_F(OperatorTest, Checksum) {
     auto filter_scan_ptr = std::make_unique<FilterScan>(r1_scan_filter);
     std::vector<SelectInfo> checksum_columns;
     checksum_columns.emplace_back(0, rel_binding, 2);
-    Checksum checksum(move(filter_scan_ptr), checksum_columns);
+    Checksum checksum(std::move(filter_scan_ptr), checksum_columns);
     checksum.run();
     ASSERT_EQ(checksum.check_sums().size(), 1ull);
     ASSERT_EQ(checksum.check_sums()[0], constant);

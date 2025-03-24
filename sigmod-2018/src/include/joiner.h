@@ -25,7 +25,7 @@ public:
     const std::vector<Relation> &relations() const {
         return relations_;
     }
-
+    std::vector<Relation>& getRelations();
 private:
     /// Add scan to query
     std::unique_ptr<Operator> addScan(std::set<unsigned> &used_relations,

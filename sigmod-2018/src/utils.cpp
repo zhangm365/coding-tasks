@@ -18,7 +18,7 @@ Relation Utils::createRelation(uint64_t size, uint64_t num_columns) {
     for (unsigned i = 0; i < num_columns; ++i) {
         createColumn(columns, size);
     }
-    return Relation(size, move(columns));
+    return Relation(size, std::move(columns));
 }
 
 // Store a relation in all formats

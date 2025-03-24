@@ -13,7 +13,12 @@
 
 namespace {
 
-enum QueryGraphProvides { Left, Right, Both, None };
+enum QueryGraphProvides {
+    Left,
+    Right,
+    Both,
+    None
+};
 
 // Analyzes inputs of join
 QueryGraphProvides analyzeInputOfJoin(std::set<unsigned> &usedRelations,
@@ -79,7 +84,7 @@ std::string Joiner::join(QueryInfo &query) {
     left = addScan(used_relations, firstJoin.left, query);
     right = addScan(used_relations, firstJoin.right, query);
     std::unique_ptr<Operator>
-    root = std::make_unique<Join>(move(left), move(right), firstJoin);
+    root = std::make_unique<Join>(std::move(left), std::move(right), firstJoin);
 
     auto predicates_copy = query.predicates();
     for (unsigned i = 1; i < predicates_copy.size(); ++i) {
@@ -89,22 +94,22 @@ std::string Joiner::join(QueryInfo &query) {
 
         switch (analyzeInputOfJoin(used_relations, left_info, right_info)) {
         case QueryGraphProvides::Left:
-            left = move(root);
+            left = std::move(root);
             right = addScan(used_relations, right_info, query);
-            root = std::make_unique<Join>(move(left), move(right), p_info);
+            root = std::make_unique<Join>(std::move(left), std::move(right), p_info);
             break;
         case QueryGraphProvides::Right:
             left = addScan(used_relations,
                            left_info,
                            query);
-            right = move(root);
-            root = std::make_unique<Join>(move(left), move(right), p_info);
+            right = std::move(root);
+            root = std::make_unique<Join>(std::move(left), std::move(right), p_info);
             break;
         case QueryGraphProvides::Both:
             // All relations of this join are already used somewhere else in the
             // query. Thus, we have either a cycle in our join graph or more than
             // one join predicate per join.
-            root = std::make_unique<SelfJoin>(move(root), p_info);
+            root = std::make_unique<SelfJoin>(std::move(root), p_info);
             break;
         case QueryGraphProvides::None:
             // Process this predicate later when we can connect it to the other
@@ -114,7 +119,7 @@ std::string Joiner::join(QueryInfo &query) {
         };
     }
 
-    Checksum checksum(move(root), query.selections());
+    Checksum checksum(std::move(root), query.selections());
     checksum.run();
 
     std::stringstream out;
@@ -128,3 +133,6 @@ std::string Joiner::join(QueryInfo &query) {
     return out.str();
 }
 
+std::vector<Relation> &Joiner::getRelations() {
+    return relations_;
+}

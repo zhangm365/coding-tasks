@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <string>
 #include <vector>
+#include "statistic.h"
 
 using RelationId = unsigned;
 
@@ -45,6 +46,7 @@ public:
         return columns_;
     }
 
+    std::vector<ColumnStatistics> statistics;
 private:
     /// Loads data from a file
     void loadRelation(const char *file_name);
